@@ -1,6 +1,5 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class GameController : MonoBehaviour
 {
@@ -16,6 +15,9 @@ public class GameController : MonoBehaviour
     public GameObject enemyMissilePrefab;
     public GameObject enemyContainer;
 
+    public Text levelText;
+    public Text scoreText;
+
     private float enemyShootingTimer;
     private float enemyMissileSpeed;
     private float enemyMovementTimer;
@@ -24,11 +26,27 @@ public class GameController : MonoBehaviour
     private Enemy[] enemies;
     private int initialEnemyCount;
 
+    private int level = 1;
+    private int score = 0;
+
     // Start is called before the first frame update
     void Start()
     {
         enemies = GetComponentsInChildren<Enemy>();
+        foreach(var enemy in enemies)
+        {
+            enemy.OnEnemyHit += OnEnemyHit;
+            var sr = enemy.GetComponent<SpriteRenderer>();
+            Color yellow = new Color(1.0f, 0.961f, 0);
+            if (sr.color == Color.white)
+                enemy.value = 30;
+            else if (sr.color.ToString() == yellow.ToString())
+                enemy.value = 20;
+        }
         initialEnemyCount = enemies.Length;
+
+        levelText.text = level.ToString();
+        scoreText.text = score.ToString();
 
         ResetEnemyShootingInterval();
         ResetEnemyMovementInterval();
@@ -130,5 +148,16 @@ public class GameController : MonoBehaviour
 
         enemyMovementInterval = enemyMaxMovementInterval - (enemyMaxMovementInterval - enemyMinMovementInterval) * difficulty;
         enemyMovementTimer = enemyMovementInterval;
+    }
+
+    private void OnEnemyHit(int points)
+    {
+        AddToScore(points);
+    }
+
+    private void AddToScore(int points)
+    {
+        score += points;
+        scoreText.text = score.ToString();
     }
 }

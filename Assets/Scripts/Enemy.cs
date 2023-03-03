@@ -1,11 +1,13 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class Enemy : MonoBehaviour
 {
-    private Player player;
+    public delegate void EnemyHandler(int points);
+    public event EnemyHandler OnEnemyHit;
+    public int value = 10;
+
     public GameObject explosionPrefab;
+    private Player player;
     
     // Start is called before the first frame update
     void Start()
@@ -23,6 +25,7 @@ public class Enemy : MonoBehaviour
 
             Destroy(gameObject);
             Destroy(collision.gameObject);
+            OnEnemyHit?.Invoke(value);
 
             player.ResetCooldown();
         }
