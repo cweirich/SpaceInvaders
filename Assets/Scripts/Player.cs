@@ -10,6 +10,9 @@ public class Player : MonoBehaviour
     public GameObject missilePrefab;
     public GameObject explosionPrefab;
 
+    public delegate void PlayerHandler();
+    public event PlayerHandler OnPlayerHit;
+
     private bool fired = false;
     private float cooldown;
     private static Player instance;
@@ -70,6 +73,7 @@ public class Player : MonoBehaviour
 
             Destroy(gameObject);
             Destroy(collision.gameObject);
+            OnPlayerHit?.Invoke();
         }
     }
 

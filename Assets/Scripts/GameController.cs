@@ -1,4 +1,6 @@
+using System.Collections;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class GameController : MonoBehaviour
@@ -17,14 +19,17 @@ public class GameController : MonoBehaviour
 
     public Text levelText;
     public Text scoreText;
+    public Text gameOverText;
 
     private float enemyShootingTimer;
     private float enemyMissileSpeed;
     private float enemyMovementTimer;
     private float enemyMovementDirection = 1f;
     private float enemyMovementInterval;
+    private Player player;
     private Enemy[] enemies;
     private int initialEnemyCount;
+    private readonly float restartTimer = 3f;
 
     private int level = 1;
     private int score = 0;
@@ -32,6 +37,8 @@ public class GameController : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        player = GetComponentInChildren<Player>();
+        player.OnPlayerHit += GameOver;
         enemies = GetComponentsInChildren<Enemy>();
         foreach(var enemy in enemies)
         {
@@ -47,6 +54,7 @@ public class GameController : MonoBehaviour
 
         levelText.text = level.ToString();
         scoreText.text = score.ToString();
+        gameOverText.gameObject.SetActive(false);
 
         ResetEnemyShootingInterval();
         ResetEnemyMovementInterval();
@@ -58,6 +66,10 @@ public class GameController : MonoBehaviour
         enemies = GetComponentsInChildren<Enemy>();
         EnemyShooting();
         EnemyMovement();
+        if (Input.GetKey(KeyCode.Escape))
+        {
+            Application.Quit();
+        }
     }
 
     private void EnemyMovement()
@@ -153,6 +165,19 @@ public class GameController : MonoBehaviour
     private void OnEnemyHit(int points)
     {
         AddToScore(points);
+    }
+
+    private void GameOver()
+    {
+        gameOverText.gameObject.SetActive(true);
+        StartCoroutine(Restart());
+    }
+
+    private IEnumerator Restart()
+    {
+        yield return new WaitForSeconds(restartTimer);
+
+        SceneManager.LoadScene("Game");
     }
 
     private void AddToScore(int points)
