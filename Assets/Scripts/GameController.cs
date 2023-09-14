@@ -20,8 +20,11 @@ public class GameController : MonoBehaviour
     public Text levelText;
     public Text scoreText;
     public Text gameOverText;
+    public Text levelUpText;
 
     public AudioSource boingSfx;
+    public AudioSource deathSfx;
+    public AudioSource levelUpSfx;
 
     private float enemyShootingTimer;
     private float enemyMissileSpeed;
@@ -33,11 +36,11 @@ public class GameController : MonoBehaviour
     private int initialEnemyCount;
     private readonly float restartTimer = 3f;
 
-    private int level = 1;
-    private int score = 0;
+    private static int level = 1;
+    private static int score = 0;
 
     // Start is called before the first frame update
-    void Start()
+    public void Start()
     {
         player = GetComponentInChildren<Player>();
         player.OnPlayerHit += GameOver;
@@ -48,22 +51,25 @@ public class GameController : MonoBehaviour
             var sr = enemy.GetComponent<SpriteRenderer>();
             Color yellow = new Color(1.0f, 0.961f, 0);
             if (sr.color == Color.white)
-                enemy.value = 30;
+                enemy.value = 30 * level;
             else if (sr.color.ToString() == yellow.ToString())
-                enemy.value = 20;
+                enemy.value = 20 * level;
+            else
+                enemy.value = 10 * level;
         }
         initialEnemyCount = enemies.Length;
 
         levelText.text = level.ToString();
         scoreText.text = score.ToString();
         gameOverText.gameObject.SetActive(false);
+        levelUpText.gameObject.SetActive(false);
 
         ResetEnemyShootingInterval();
         ResetEnemyMovementInterval();
     }
 
     // Update is called once per frame
-    void Update()
+    public void Update()
     {
         enemies = GetComponentsInChildren<Enemy>();
         EnemyShooting();
@@ -181,12 +187,26 @@ public class GameController : MonoBehaviour
     private void OnEnemyHit(int points)
     {
         AddToScore(points);
+
+        if (enemies.Length == 1)
+            LevelUp();
     }
 
     private void GameOver()
     {
         gameOverText.gameObject.SetActive(true);
+        deathSfx.Play();
         StartCoroutine(Restart());
+        score = 0;
+        level = 1;
+    }
+
+    private void LevelUp()
+    {
+        levelUpText.gameObject.SetActive(true);
+        levelUpSfx.Play();
+        StartCoroutine(Restart());
+        level++;
     }
 
     private IEnumerator Restart()

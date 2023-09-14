@@ -10,12 +10,12 @@ public class Enemy : MonoBehaviour
     private Player player;
     
     // Start is called before the first frame update
-    void Start()
+    public void Start()
     {
         player = Player.Instance;
     }
 
-    private void OnTriggerEnter2D(Collider2D collision)
+    public void OnTriggerEnter2D(Collider2D collision)
     {
         if (collision.CompareTag("PlayerMissile"))
         {

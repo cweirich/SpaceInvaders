@@ -13,20 +13,22 @@ public class Player : MonoBehaviour
     public delegate void PlayerHandler();
     public event PlayerHandler OnPlayerHit;
 
+    public AudioSource blastSfx;
+
     private bool fired = false;
     private float cooldown;
     private static Player instance;
 
     public static Player Instance => instance;
 
-    private void Awake()
+    public void Awake()
     {
         if (instance == null)
             instance = this;
     }
 
     // Update is called once per frame
-    private void Update()
+    public void Update()
     {
         float posX = transform.position.x;
         Rigidbody2D rb = GetComponent<Rigidbody2D>();
@@ -48,6 +50,7 @@ public class Player : MonoBehaviour
         {
             if (cooldown <= 0 && !fired)
             {
+                blastSfx.Play();
                 fired = true;
                 cooldown = cooldownLimit;
 
@@ -63,7 +66,7 @@ public class Player : MonoBehaviour
             fired = false;
     }
 
-    private void OnTriggerEnter2D(Collider2D collision)
+    public void OnTriggerEnter2D(Collider2D collision)
     {
         if (collision.CompareTag("EnemyMissile") || collision.CompareTag("Enemy"))
         {
