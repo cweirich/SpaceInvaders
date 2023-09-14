@@ -21,6 +21,8 @@ public class GameController : MonoBehaviour
     public Text scoreText;
     public Text gameOverText;
 
+    public AudioSource boingSfx;
+
     private float enemyShootingTimer;
     private float enemyMissileSpeed;
     private float enemyMovementTimer;
@@ -81,7 +83,13 @@ public class GameController : MonoBehaviour
 
             if (enemies.Length == 0)
                 return;
-            
+
+            if (!boingSfx.isPlaying)
+            {
+                boingSfx.pitch = ManagePitch(boingSfx.pitch);
+                boingSfx.Play();
+            }
+
             float posX = enemyContainer.transform.position.x;
             float posY = enemyContainer.transform.position.y;
 
@@ -116,6 +124,14 @@ public class GameController : MonoBehaviour
                     DownAndReverse(posX, posY);
             }
         }
+    }
+
+    private float ManagePitch(float currentPitch)
+    {
+        if (Mathf.Approximately(currentPitch, 0.7f))
+            return 1;
+
+        return currentPitch - 0.1f;
     }
 
     private void DownAndReverse(float posX, float posY)
